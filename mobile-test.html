@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Compatibility Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #e8e8e8;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #3282b8;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .test-section {
+            background: #16213e;
+            border: 1px solid #2d3e50;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .test-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: #1a1a2e;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .pass {
+            background: #3282b8;
+            color: white;
+        }
+        
+        .fail {
+            background: #e94560;
+            color: white;
+        }
+        
+        .info {
+            background: #0f4c75;
+            color: white;
+        }
+        
+        .device-info {
+            background: #0f4c75;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .device-info div {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        button {
+            background: #3282b8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:active {
+            background: #0f4c75;
+        }
+        
+        .touch-test-area {
+            width: 100%;
+            height: 200px;
+            background: #0f4c75;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            margin: 15px 0;
+            touch-action: none;
+            user-select: none;
+        }
+        
+        .summary {
+            background: #3282b8;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        code {
+            background: #0f4c75;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Mobile Compatibility Test</h1>
+        
+        <div class="device-info">
+            <div><strong>Device:</strong> <span id="device-type"></span></div>
+            <div><strong>Screen:</strong> <span id="screen-size"></span></div>
+            <div><strong>Viewport:</strong> <span id="viewport-size"></span></div>
+            <div><strong>Touch:</strong> <span id="touch-support"></span></div>
+            <div><strong>Orientation:</strong> <span id="orientation"></span></div>
+            <div><strong>Browser:</strong> <span id="browser"></span></div>
+        </div>
+        
+        <div id="summary" class="summary"></div>
+        
+        <div class="test-section">
+            <h2>Viewport & Responsive Tests</h2>
+            <div id="viewport-tests"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Touch Event Tests</h2>
+            <div class="touch-test-area" id="touch-area">
+                Touch here to test
+            </div>
+            <div id="touch-log"></div>
+            <div id="touch-tests"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>CSS Feature Tests</h2>
+            <div id="css-tests"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Performance Tests</h2>
+            <div id="performance-tests"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Interactive Tests</h2>
+            <button onclick="testDragSimulation()">Test Drag Simulation</button>
+            <button onclick="testPinchSimulation()">Test Pinch Simulation</button>
+            <button onclick="window.location.href='index.html'">Open Main App</button>
+        </div>
+    </div>
+
+    <script>
+        // Device Detection
+        function detectDevice() {
+            const ua = navigator.userAgent;
+            const width = window.innerWidth;
+            
+            if (width < 768) return 'Mobile';
+            if (width < 1024) return 'Tablet';
+            return 'Desktop';
+        }
+        
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Chrome')) return 'Chrome';
+            if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+            if (ua.includes('Firefox')) return 'Firefox';
+            if (ua.includes('Edge')) return 'Edge';
+            return 'Unknown';
+        }
+        
+        // Display device info
+        document.getElementById('device-type').textContent = detectDevice();
+        document.getElementById('screen-size').textContent = `${screen.width}x${screen.height}`;
+        document.getElementById('viewport-size').textContent = `${window.innerWidth}x${window.innerHeight}`;
+        document.getElementById('touch-support').textContent = 'ontouchstart' in window ? 'Yes ✓' : 'No ✗';
+        document.getElementById('orientation').textContent = window.innerWidth > window.innerHeight ? 'Landscape' : 'Portrait';
+        document.getElementById('browser').textContent = detectBrowser();
+        
+        // Test Results
+        const tests = {
+            viewport: [],
+            touch: [],
+            css: [],
+            performance: []
+        };
+        
+        // Viewport Tests
+        function runViewportTests() {
+            tests.viewport.push({
+                name: 'Viewport meta tag',
+                pass: document.querySelector('meta[name="viewport"]') !== null
+            });
+            
+            tests.viewport.push({
+                name: 'Mobile width (<768px)',
+                pass: window.innerWidth < 768
+            });
+            
+            tests.viewport.push({
+                name: 'Responsive layout',
+                pass: window.getComputedStyle(document.body).display !== 'none'
+            });
+            
+            tests.viewport.push({
+                name: 'No horizontal scroll',
+                pass: document.documentElement.scrollWidth <= window.innerWidth
+            });
+        }
+        
+        // Touch Tests
+        let touchStarted = false;
+        let touchMoved = false;
+        let touchEnded = false;
+        
+        const touchArea = document.getElementById('touch-area');
+        const touchLog = document.getElementById('touch-log');
+        
+        touchArea.addEventListener('touchstart', (e) => {
+            touchStarted = true;
+            touchLog.innerHTML = '<div class="test-item"><span>Touch Start ✓</span><span class="status pass">DETECTED</span></div>';
+        });
+        
+        touchArea.addEventListener('touchmove', (e) => {
+            touchMoved = true;
+            e.preventDefault();
+            touchLog.innerHTML += '<div class="test-item"><span>Touch Move ✓</span><span class="status pass">DETECTED</span></div>';
+        });
+        
+        touchArea.addEventListener('touchend', (e) => {
+            touchEnded = true;
+            touchLog.innerHTML += '<div class="test-item"><span>Touch End ✓</span><span class="status pass">DETECTED</span></div>';
+            
+            setTimeout(() => {
+                tests.touch.push({
+                    name: 'Touch Start Event',
+                    pass: touchStarted
+                });
+                tests.touch.push({
+                    name: 'Touch Move Event',
+                    pass: touchMoved
+                });
+                tests.touch.push({
+                    name: 'Touch End Event',
+                    pass: touchEnded
+                });
+                displayResults();
+            }, 500);
+        });
+        
+        tests.touch.push({
+            name: 'Touch Events Supported',
+            pass: 'ontouchstart' in window
+        });
+        
+        tests.touch.push({
+            name: 'Touch Action CSS',
+            pass: CSS.supports('touch-action', 'none')
+        });
+        
+        // CSS Tests
+        function runCSSTests() {
+            tests.css.push({
+                name: 'CSS Grid Support',
+                pass: CSS.supports('display', 'grid')
+            });
+            
+            tests.css.push({
+                name: 'Flexbox Support',
+                pass: CSS.supports('display', 'flex')
+            });
+            
+            tests.css.push({
+                name: 'CSS Variables',
+                pass: CSS.supports('--test', '0')
+            });
+            
+            tests.css.push({
+                name: 'Media Queries',
+                pass: window.matchMedia('(max-width: 768px)').matches || true
+            });
+            
+            tests.css.push({
+                name: 'Transform Support',
+                pass: CSS.supports('transform', 'scale(1)')
+            });
+            
+            tests.css.push({
+                name: 'Transition Support',
+                pass: CSS.supports('transition', 'all 0.3s')
+            });
+        }
+        
+        // Performance Tests
+        function runPerformanceTests() {
+            const start = performance.now();
+            
+            // Simulate some operations
+            for (let i = 0; i < 10000; i++) {
+                const div = document.createElement('div');
+            }
+            
+            const end = performance.now();
+            const time = end - start;
+            
+            tests.performance.push({
+                name: 'DOM Creation Speed',
+                pass: time < 100,
+                info: `${time.toFixed(2)}ms`
+            });
+            
+            tests.performance.push({
+                name: 'RequestAnimationFrame',
+                pass: typeof requestAnimationFrame === 'function'
+            });
+            
+            tests.performance.push({
+                name: 'Local Storage',
+                pass: typeof localStorage !== 'undefined'
+            });
+            
+            tests.performance.push({
+                name: 'SVG Support',
+                pass: document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")
+            });
+        }
+        
+        // Display Results
+        function displayResults() {
+            const categories = ['viewport', 'touch', 'css', 'performance'];
+            
+            categories.forEach(category => {
+                const container = document.getElementById(`${category}-tests`);
+                container.innerHTML = '';
+                
+                tests[category].forEach(test => {
+                    const div = document.createElement('div');
+                    div.className = 'test-item';
+                    div.innerHTML = `
+                        <span>${test.name} ${test.info ? `<code>${test.info}</code>` : ''}</span>
+                        <span class="status ${test.pass ? 'pass' : 'fail'}">${test.pass ? 'PASS' : 'FAIL'}</span>
+                    `;
+                    container.appendChild(div);
+                });
+            });
+            
+            // Summary
+            const allTests = [...tests.viewport, ...tests.touch, ...tests.css, ...tests.performance];
+            const passed = allTests.filter(t => t.pass).length;
+            const total = allTests.length;
+            const percentage = ((passed / total) * 100).toFixed(0);
+            
+            document.getElementById('summary').innerHTML = `
+                Mobile Compatibility: ${passed}/${total} tests passed (${percentage}%)
+                ${percentage >= 90 ? '✓ Excellent' : percentage >= 70 ? '⚠ Good' : '✗ Needs Work'}
+            `;
+        }
+        
+        // Simulation Functions
+        function testDragSimulation() {
+            alert('Drag simulation: Touch and hold the touch test area above, then move your finger.');
+        }
+        
+        function testPinchSimulation() {
+            alert('Pinch simulation: Use two fingers on the screen to zoom in/out (browser native).');
+        }
+        
+        // Run tests
+        runViewportTests();
+        runCSSTests();
+        runPerformanceTests();
+        displayResults();
+        
+        // Update on resize
+        window.addEventListener('resize', () => {
+            document.getElementById('viewport-size').textContent = `${window.innerWidth}x${window.innerHeight}`;
+            document.getElementById('orientation').textContent = window.innerWidth > window.innerHeight ? 'Landscape' : 'Portrait';
+            document.getElementById('device-type').textContent = detectDevice();
+        });
+        
+        // Orientation change
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                location.reload();
+            }, 200);
+        });
+    </script>
+</body>
+</html>

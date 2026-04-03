@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Simulator - Logic Gate Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e8e8e8;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .simulator-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #3282b8;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .controls {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .controls button {
+            background: #3282b8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .controls button:hover {
+            background: #0f4c75;
+        }
+        
+        .controls button.active {
+            background: #00ff88;
+            color: #1a1a2e;
+        }
+        
+        .device-frame {
+            margin: 0 auto;
+            background: #2d2d2d;
+            border-radius: 30px;
+            padding: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .device-frame.iphone {
+            width: 375px;
+            height: 812px;
+        }
+        
+        .device-frame.iphone-landscape {
+            width: 812px;
+            height: 375px;
+        }
+        
+        .device-frame.android {
+            width: 360px;
+            height: 740px;
+        }
+        
+        .device-frame.android-landscape {
+            width: 740px;
+            height: 360px;
+        }
+        
+        .device-frame.tablet {
+            width: 768px;
+            height: 1024px;
+        }
+        
+        .device-frame.tablet-landscape {
+            width: 1024px;
+            height: 768px;
+        }
+        
+        .device-screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .device-info {
+            text-align: center;
+            margin-top: 15px;
+            color: #a0a0a0;
+            font-size: 14px;
+        }
+        
+        .instructions {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .instructions h3 {
+            color: #3282b8;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .touch-indicator {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #3282b8;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+        
+        .touch-indicator.active {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="simulator-container">
+        <h1>📱 Mobile Simulator - Logic Gate Simulator</h1>
+        
+        <div class="controls">
+            <button onclick="setDevice('iphone')" id="btn-iphone">iPhone (375x812)</button>
+            <button onclick="setDevice('iphone-landscape')" id="btn-iphone-landscape">iPhone Landscape</button>
+            <button onclick="setDevice('android')" id="btn-android">Android (360x740)</button>
+            <button onclick="setDevice('android-landscape')" id="btn-android-landscape">Android Landscape</button>
+            <button onclick="setDevice('tablet')" id="btn-tablet">Tablet (768x1024)</button>
+            <button onclick="setDevice('tablet-landscape')" id="btn-tablet-landscape">Tablet Landscape</button>
+            <button onclick="reloadFrame()">🔄 Reload</button>
+            <button onclick="openInNewTab()">🔗 Open in New Tab</button>
+        </div>
+        
+        <div class="device-frame iphone" id="device-frame">
+            <div class="device-screen">
+                <iframe src="index.html" id="app-frame"></iframe>
+                <div class="touch-indicator" id="touch-indicator"></div>
+            </div>
+        </div>
+        
+        <div class="device-info" id="device-info">
+            iPhone (375x812) - Portrait
+        </div>
+        
+        <div class="instructions">
+            <h3>Testing Instructions</h3>
+            <ul>
+                <li><strong>Device Selection:</strong> Click buttons above to switch between devices</li>
+                <li><strong>Mouse as Touch:</strong> Click and drag to simulate touch interactions</li>
+                <li><strong>Test Features:</strong>
+                    <ul>
+                        <li>Drag gates from palette to canvas</li>
+                        <li>Click INPUT gates to toggle</li>
+                        <li>Create wires by clicking pins</li>
+                        <li>Test responsive layout in different orientations</li>
+                    </ul>
+                </li>
+                <li><strong>Responsive Breakpoints:</strong>
+                    <ul>
+                        <li>Mobile: &lt;768px (iPhone, Android)</li>
+                        <li>Tablet: 768px-1024px</li>
+                        <li>Desktop: &gt;1024px</li>
+                    </ul>
+                </li>
+                <li><strong>Open in New Tab:</strong> Test with browser dev tools mobile emulation</li>
+            </ul>
+            
+            <h3 style="margin-top: 20px;">Expected Mobile Behavior</h3>
+            <ul>
+                <li>✓ Horizontal scrolling gate palette at top</li>
+                <li>✓ Stacked layout (palette → canvas → truth table)</li>
+                <li>✓ Larger touch targets (pins, buttons)</li>
+                <li>✓ Responsive toolbar with wrapped buttons</li>
+                <li>✓ Touch-friendly interactions</li>
+                <li>✓ No horizontal page scroll</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const devices = {
+            'iphone': { width: 375, height: 812, name: 'iPhone (375x812) - Portrait' },
+            'iphone-landscape': { width: 812, height: 375, name: 'iPhone (812x375) - Landscape' },
+            'android': { width: 360, height: 740, name: 'Android (360x740) - Portrait' },
+            'android-landscape': { width: 740, height: 360, name: 'Android (740x360) - Landscape' },
+            'tablet': { width: 768, height: 1024, name: 'Tablet (768x1024) - Portrait' },
+            'tablet-landscape': { width: 1024, height: 768, name: 'Tablet (1024x768) - Landscape' }
+        };
+        
+        let currentDevice = 'iphone';
+        
+        function setDevice(deviceType) {
+            currentDevice = deviceType;
+            const frame = document.getElementById('device-frame');
+            const info = document.getElementById('device-info');
+            
+            // Remove all device classes
+            frame.className = 'device-frame';
+            
+            // Add new device class
+            frame.classList.add(deviceType);
+            
+            // Update info
+            info.textContent = devices[deviceType].name;
+            
+            // Update button states
+            document.querySelectorAll('.controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${deviceType}`).classList.add('active');
+        }
+        
+        function reloadFrame() {
+            const frame = document.getElementById('app-frame');
+            frame.src = frame.src;
+        }
+        
+        function openInNewTab() {
+            window.open('index.html', '_blank');
+        }
+        
+        // Touch indicator
+        const frame = document.getElementById('app-frame');
+        const indicator = document.getElementById('touch-indicator');
+        
+        document.querySelector('.device-screen').addEventListener('mousedown', (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            indicator.style.left = (e.clientX - rect.left - 20) + 'px';
+            indicator.style.top = (e.clientY - rect.top - 20) + 'px';
+            indicator.classList.add('active');
+        });
+        
+        document.addEventListener('mouseup', () => {
+            indicator.classList.remove('active');
+        });
+        
+        // Set initial device
+        setDevice('iphone');
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                reloadFrame();
+            }
+            if (e.key === '1') setDevice('iphone');
+            if (e.key === '2') setDevice('iphone-landscape');
+            if (e.key === '3') setDevice('android');
+            if (e.key === '4') setDevice('android-landscape');
+            if (e.key === '5') setDevice('tablet');
+            if (e.key === '6') setDevice('tablet-landscape');
+        });
+    </script>
+</body>
+</html>

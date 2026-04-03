@@ -62,6 +62,16 @@ class CanvasController {
             }
         });
         
+        element.addEventListener('touchstart', (e) => {
+            if (e.target.classList.contains('pin')) {
+                e.preventDefault();
+                this.handlePinClick(gate, e.target);
+            } else if (type !== 'INPUT') {
+                e.preventDefault();
+                this.startDragging(gate, e);
+            }
+        }, { passive: false });
+        
         if (type !== 'INPUT') {
             element.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('pin')) {
@@ -81,18 +91,25 @@ class CanvasController {
         this.selectedGate = gate;
         this.selectGate(gate);
         
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
         const rect = gate.element.getBoundingClientRect();
         const containerRect = this.canvasContainer.getBoundingClientRect();
         this.dragOffset = {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+            x: clientX - rect.left,
+            y: clientY - rect.top
         };
         
-        const onMouseMove = (e) => {
+        const onMove = (e) => {
             if (!this.isDragging) return;
+            e.preventDefault();
             
-            const x = Math.round((e.clientX - containerRect.left - this.dragOffset.x) / 20) * 20;
-            const y = Math.round((e.clientY - containerRect.top - this.dragOffset.y) / 20) * 20;
+            const moveX = e.touches ? e.touches[0].clientX : e.clientX;
+            const moveY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const x = Math.round((moveX - containerRect.left - this.dragOffset.x) / 20) * 20;
+            const y = Math.round((moveY - containerRect.top - this.dragOffset.y) / 20) * 20;
             
             gate.x = x;
             gate.y = y;
@@ -102,14 +119,18 @@ class CanvasController {
             this.updateWires();
         };
         
-        const onMouseUp = () => {
+        const onEnd = () => {
             this.isDragging = false;
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onEnd);
+            document.removeEventListener('touchmove', onMove);
+            document.removeEventListener('touchend', onEnd);
         };
         
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onEnd);
     }
     
     handlePinClick(gate, pinElement) {
@@ -138,13 +159,17 @@ class CanvasController {
     }
     
     startWirePreview() {
-        const onMouseMove = (e) => {
+        const onMove = (e) => {
             if (!this.wireStart) return;
+            e.preventDefault();
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
             const rect = this.canvasContainer.getBoundingClientRect();
             const startPos = this.wireStart.gate.getPinPosition(0, false);
-            const endX = e.clientX - rect.left;
-            const endY = e.clientY - rect.top;
+            const endX = clientX - rect.left;
+            const endY = clientY - rect.top;
             
             if (!this.wirePreview) {
                 this.wirePreview = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -158,8 +183,9 @@ class CanvasController {
             this.wirePreview.setAttribute('d', path);
         };
         
-        document.addEventListener('mousemove', onMouseMove);
-        this.wirePreviewListener = onMouseMove;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        this.wirePreviewListener = onMove;
     }
     
     stopWirePreview() {
@@ -169,6 +195,7 @@ class CanvasController {
         }
         if (this.wirePreviewListener) {
             document.removeEventListener('mousemove', this.wirePreviewListener);
+            document.removeEventListener('touchmove', this.wirePreviewListener);
             this.wirePreviewListener = null;
         }
     }
