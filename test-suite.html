@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic Gate Simulator - Test Suite</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #e8e8e8;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #3282b8;
+            border-bottom: 2px solid #0f4c75;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #3282b8;
+            margin-top: 30px;
+        }
+        .test-section {
+            background: #16213e;
+            border: 1px solid #2d3e50;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #2d3e50;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background: #0f4c75;
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: rgba(48, 130, 184, 0.05);
+        }
+        .pass {
+            color: #3282b8;
+            font-weight: bold;
+        }
+        .fail {
+            color: #e94560;
+            font-weight: bold;
+        }
+        .summary {
+            background: #0f4c75;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .summary.all-pass {
+            background: #3282b8;
+        }
+        .summary.has-fail {
+            background: #e94560;
+        }
+        code {
+            background: #0f4c75;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .test-description {
+            color: #a0a0a0;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Logic Gate Simulator - Comprehensive Test Suite</h1>
+    
+    <div id="summary"></div>
+    
+    <div class="test-section">
+        <h2>1. Gate Logic Tests</h2>
+        <p class="test-description">Testing all gate types with their complete truth tables</p>
+        <div id="gate-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Multi-Input Gate Tests</h2>
+        <p class="test-description">Testing gates with 3+ inputs</p>
+        <div id="multi-input-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Edge Case Tests</h2>
+        <p class="test-description">Testing boundary conditions and special cases</p>
+        <div id="edge-case-tests"></div>
+    </div>
+
+    <script>
+        // Gate evaluation logic (same as in gate.js)
+        function evaluateGate(type, inputs) {
+            let output;
+            
+            switch (type) {
+                case 'INPUT':
+                    output = inputs[0] || 0;
+                    break;
+                    
+                case 'OUTPUT':
+                    output = inputs[0] || 0;
+                    break;
+                    
+                case 'AND':
+                    if (inputs.length === 0) {
+                        output = 0;
+                    } else {
+                        output = inputs.every(v => v === 1) ? 1 : 0;
+                    }
+                    break;
+                    
+                case 'OR':
+                    output = inputs.some(v => v === 1) ? 1 : 0;
+                    break;
+                    
+                case 'NOT':
+                    output = (inputs[0] === 1) ? 0 : 1;
+                    break;
+                    
+                case 'NAND':
+                    if (inputs.length === 0) {
+                        output = 1;
+                    } else {
+                        output = inputs.every(v => v === 1) ? 0 : 1;
+                    }
+                    break;
+                    
+                case 'NOR':
+                    output = inputs.some(v => v === 1) ? 0 : 1;
+                    break;
+                    
+                case 'XOR':
+                    const onesCount = inputs.filter(v => v === 1).length;
+                    output = (onesCount % 2 === 1) ? 1 : 0;
+                    break;
+                    
+                case 'XNOR':
+                    const xnorOnesCount = inputs.filter(v => v === 1).length;
+                    output = (xnorOnesCount % 2 === 0) ? 1 : 0;
+                    break;
+                    
+                default:
+                    output = 0;
+            }
+            
+            return output;
+        }
+
+        // Test definitions
+        const basicTests = [
+            // AND gate
+            { gate: 'AND', inputs: [0, 0], expected: 0, description: '0 AND 0 = 0' },
+            { gate: 'AND', inputs: [0, 1], expected: 0, description: '0 AND 1 = 0' },
+            { gate: 'AND', inputs: [1, 0], expected: 0, description: '1 AND 0 = 0' },
+            { gate: 'AND', inputs: [1, 1], expected: 1, description: '1 AND 1 = 1' },
+            
+            // OR gate
+            { gate: 'OR', inputs: [0, 0], expected: 0, description: '0 OR 0 = 0' },
+            { gate: 'OR', inputs: [0, 1], expected: 1, description: '0 OR 1 = 1' },
+            { gate: 'OR', inputs: [1, 0], expected: 1, description: '1 OR 0 = 1' },
+            { gate: 'OR', inputs: [1, 1], expected: 1, description: '1 OR 1 = 1' },
+            
+            // NOT gate
+            { gate: 'NOT', inputs: [0], expected: 1, description: 'NOT 0 = 1' },
+            { gate: 'NOT', inputs: [1], expected: 0, description: 'NOT 1 = 0' },
+            
+            // NAND gate
+            { gate: 'NAND', inputs: [0, 0], expected: 1, description: '0 NAND 0 = 1' },
+            { gate: 'NAND', inputs: [0, 1], expected: 1, description: '0 NAND 1 = 1' },
+            { gate: 'NAND', inputs: [1, 0], expected: 1, description: '1 NAND 0 = 1' },
+            { gate: 'NAND', inputs: [1, 1], expected: 0, description: '1 NAND 1 = 0' },
+            
+            // NOR gate
+            { gate: 'NOR', inputs: [0, 0], expected: 1, description: '0 NOR 0 = 1' },
+            { gate: 'NOR', inputs: [0, 1], expected: 0, description: '0 NOR 1 = 0' },
+            { gate: 'NOR', inputs: [1, 0], expected: 0, description: '1 NOR 0 = 0' },
+            { gate: 'NOR', inputs: [1, 1], expected: 0, description: '1 NOR 1 = 0' },
+            
+            // XOR gate
+            { gate: 'XOR', inputs: [0, 0], expected: 0, description: '0 XOR 0 = 0' },
+            { gate: 'XOR', inputs: [0, 1], expected: 1, description: '0 XOR 1 = 1' },
+            { gate: 'XOR', inputs: [1, 0], expected: 1, description: '1 XOR 0 = 1' },
+            { gate: 'XOR', inputs: [1, 1], expected: 0, description: '1 XOR 1 = 0' },
+            
+            // XNOR gate
+            { gate: 'XNOR', inputs: [0, 0], expected: 1, description: '0 XNOR 0 = 1' },
+            { gate: 'XNOR', inputs: [0, 1], expected: 0, description: '0 XNOR 1 = 0' },
+            { gate: 'XNOR', inputs: [1, 0], expected: 0, description: '1 XNOR 0 = 0' },
+            { gate: 'XNOR', inputs: [1, 1], expected: 1, description: '1 XNOR 1 = 1' },
+        ];
+
+        const multiInputTests = [
+            { gate: 'AND', inputs: [1, 1, 1], expected: 1, description: '3-input AND: all 1s' },
+            { gate: 'AND', inputs: [1, 1, 0], expected: 0, description: '3-input AND: one 0' },
+            { gate: 'AND', inputs: [1, 1, 1, 1], expected: 1, description: '4-input AND: all 1s' },
+            
+            { gate: 'OR', inputs: [0, 0, 1], expected: 1, description: '3-input OR: one 1' },
+            { gate: 'OR', inputs: [0, 0, 0], expected: 0, description: '3-input OR: all 0s' },
+            
+            { gate: 'XOR', inputs: [1, 1, 1], expected: 1, description: '3-input XOR: odd 1s' },
+            { gate: 'XOR', inputs: [1, 1, 0], expected: 0, description: '3-input XOR: even 1s' },
+            { gate: 'XOR', inputs: [1, 0, 0, 0], expected: 1, description: '4-input XOR: one 1' },
+            
+            { gate: 'XNOR', inputs: [1, 1, 1], expected: 0, description: '3-input XNOR: odd 1s' },
+            { gate: 'XNOR', inputs: [1, 1, 0], expected: 1, description: '3-input XNOR: even 1s' },
+        ];
+
+        const edgeCaseTests = [
+            { gate: 'AND', inputs: [], expected: 0, description: 'AND with no inputs' },
+            { gate: 'OR', inputs: [], expected: 0, description: 'OR with no inputs' },
+            { gate: 'NAND', inputs: [], expected: 1, description: 'NAND with no inputs' },
+            { gate: 'NOR', inputs: [], expected: 1, description: 'NOR with no inputs' },
+            { gate: 'XOR', inputs: [1], expected: 1, description: 'XOR with single 1' },
+            { gate: 'XOR', inputs: [0], expected: 0, description: 'XOR with single 0' },
+            { gate: 'XNOR', inputs: [0], expected: 1, description: 'XNOR with single 0' },
+        ];
+
+        // Run tests
+        function runTests(tests) {
+            let results = [];
+            tests.forEach(test => {
+                const output = evaluateGate(test.gate, test.inputs);
+                const pass = output === test.expected;
+                results.push({
+                    ...test,
+                    output,
+                    pass
+                });
+            });
+            return results;
+        }
+
+        // Display results
+        function displayResults(results, containerId) {
+            const container = document.getElementById(containerId);
+            const gates = [...new Set(results.map(r => r.gate))];
+            
+            let html = '';
+            gates.forEach(gate => {
+                const gateResults = results.filter(r => r.gate === gate);
+                html += `<h3>${gate} Gate</h3>`;
+                html += '<table>';
+                html += '<tr><th>Test</th><th>Inputs</th><th>Expected</th><th>Actual</th><th>Result</th></tr>';
+                
+                gateResults.forEach(result => {
+                    const status = result.pass ? '✓ PASS' : '✗ FAIL';
+                    const className = result.pass ? 'pass' : 'fail';
+                    html += `<tr>
+                        <td>${result.description}</td>
+                        <td>[${result.inputs.join(', ')}]</td>
+                        <td>${result.expected}</td>
+                        <td>${result.output}</td>
+                        <td class="${className}">${status}</td>
+                    </tr>`;
+                });
+                
+                html += '</table>';
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Run all tests
+        const basicResults = runTests(basicTests);
+        const multiResults = runTests(multiInputTests);
+        const edgeResults = runTests(edgeCaseTests);
+
+        displayResults(basicResults, 'gate-tests');
+        displayResults(multiResults, 'multi-input-tests');
+        displayResults(edgeResults, 'edge-case-tests');
+
+        // Summary
+        const allResults = [...basicResults, ...multiResults, ...edgeResults];
+        const totalTests = allResults.length;
+        const passedTests = allResults.filter(r => r.pass).length;
+        const failedTests = totalTests - passedTests;
+        const allPassed = failedTests === 0;
+
+        const summaryClass = allPassed ? 'all-pass' : 'has-fail';
+        const summaryIcon = allPassed ? '✓' : '✗';
+        
+        document.getElementById('summary').innerHTML = `
+            <div class="summary ${summaryClass}">
+                ${summaryIcon} Test Results: ${passedTests}/${totalTests} passed
+                ${failedTests > 0 ? ` (${failedTests} failed)` : ' - All tests passed!'}
+            </div>
+        `;
+
+        // Console output
+        console.log('=== TEST SUITE RESULTS ===');
+        console.log(`Total: ${totalTests}`);
+        console.log(`Passed: ${passedTests}`);
+        console.log(`Failed: ${failedTests}`);
+        
+        if (failedTests > 0) {
+            console.log('\nFailed tests:');
+            allResults.filter(r => !r.pass).forEach(r => {
+                console.log(`  ${r.gate}: ${r.description} - Expected ${r.expected}, got ${r.output}`);
+            });
+        }
+    </script>
+</body>
+</html>

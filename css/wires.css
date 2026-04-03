@@ -1,0 +1,51 @@
+#svg-layer path {
+    stroke-width: 2.5;
+    fill: none;
+    transition: stroke 0.2s ease;
+}
+
+.wire {
+    stroke: var(--low);
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.wire:hover {
+    stroke-width: 3.5;
+    opacity: 1;
+}
+
+.wire.high {
+    stroke: var(--high);
+    opacity: 1;
+    filter: drop-shadow(0 0 5px var(--high));
+}
+
+.wire.high.animated {
+    stroke-dasharray: 8 6;
+    animation: flow 0.6s linear infinite;
+}
+
+@keyframes flow {
+    0% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -14; }
+}
+
+.wire.low {
+    stroke: var(--low);
+    opacity: 0.5;
+}
+
+.wire-preview {
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-dasharray: 5 5;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.wire.selected {
+    stroke-width: 4;
+    opacity: 1;
+    filter: drop-shadow(0 0 8px currentColor);
+}

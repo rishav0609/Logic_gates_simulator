@@ -1,0 +1,73 @@
+#truth-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--bg);
+}
+
+#truth-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+#truth-table th {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+}
+
+#truth-table td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+    font-family: 'Courier New', monospace;
+    color: var(--text);
+}
+
+#truth-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+#truth-table tbody tr:hover {
+    background: rgba(0, 255, 136, 0.08);
+}
+
+#truth-table tbody tr.active {
+    background: rgba(0, 255, 136, 0.15);
+    border-left: 4px solid var(--accent);
+}
+
+#truth-table tbody tr.active td {
+    font-weight: bold;
+}
+
+#truth-table td.value-1 {
+    color: var(--high);
+}
+
+#truth-table td.value-0 {
+    color: var(--low);
+}
+
+#truth-table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+#truth-table-container::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+#truth-table-container::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+#truth-table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+}

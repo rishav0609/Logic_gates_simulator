@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gate Logic Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0f0a;
+            color: #00ff88;
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #00ff88;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #1e3a1e;
+        }
+        .pass {
+            color: #00ff44;
+        }
+        .fail {
+            color: #ff3333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Logic Gate Truth Table Tests</h1>
+    <div id="results"></div>
+
+    <script>
+        // Test gate logic
+        function testGate(type, inputs, expectedOutput) {
+            let output;
+            
+            switch (type) {
+                case 'AND':
+                    output = inputs.every(v => v === 1) ? 1 : 0;
+                    break;
+                case 'OR':
+                    output = inputs.some(v => v === 1) ? 1 : 0;
+                    break;
+                case 'NOT':
+                    output = (inputs[0] === 1) ? 0 : 1;
+                    break;
+                case 'NAND':
+                    output = inputs.every(v => v === 1) ? 0 : 1;
+                    break;
+                case 'NOR':
+                    output = inputs.some(v => v === 1) ? 0 : 1;
+                    break;
+                case 'XOR':
+                    const onesCount = inputs.filter(v => v === 1).length;
+                    output = (onesCount % 2 === 1) ? 1 : 0;
+                    break;
+                case 'XNOR':
+                    const xnorOnesCount = inputs.filter(v => v === 1).length;
+                    output = (xnorOnesCount % 2 === 0) ? 1 : 0;
+                    break;
+                default:
+                    output = 0;
+            }
+            
+            const pass = output === expectedOutput;
+            return { output, pass };
+        }
+
+        const tests = [
+            // AND gate
+            { gate: 'AND', inputs: [0, 0], expected: 0 },
+            { gate: 'AND', inputs: [0, 1], expected: 0 },
+            { gate: 'AND', inputs: [1, 0], expected: 0 },
+            { gate: 'AND', inputs: [1, 1], expected: 1 },
+            
+            // OR gate
+            { gate: 'OR', inputs: [0, 0], expected: 0 },
+            { gate: 'OR', inputs: [0, 1], expected: 1 },
+            { gate: 'OR', inputs: [1, 0], expected: 1 },
+            { gate: 'OR', inputs: [1, 1], expected: 1 },
+            
+            // NOT gate
+            { gate: 'NOT', inputs: [0], expected: 1 },
+            { gate: 'NOT', inputs: [1], expected: 0 },
+            
+            // NAND gate
+            { gate: 'NAND', inputs: [0, 0], expected: 1 },
+            { gate: 'NAND', inputs: [0, 1], expected: 1 },
+            { gate: 'NAND', inputs: [1, 0], expected: 1 },
+            { gate: 'NAND', inputs: [1, 1], expected: 0 },
+            
+            // NOR gate
+            { gate: 'NOR', inputs: [0, 0], expected: 1 },
+            { gate: 'NOR', inputs: [0, 1], expected: 0 },
+            { gate: 'NOR', inputs: [1, 0], expected: 0 },
+            { gate: 'NOR', inputs: [1, 1], expected: 0 },
+            
+            // XOR gate
+            { gate: 'XOR', inputs: [0, 0], expected: 0 },
+            { gate: 'XOR', inputs: [0, 1], expected: 1 },
+            { gate: 'XOR', inputs: [1, 0], expected: 1 },
+            { gate: 'XOR', inputs: [1, 1], expected: 0 },
+            
+            // XNOR gate
+            { gate: 'XNOR', inputs: [0, 0], expected: 1 },
+            { gate: 'XNOR', inputs: [0, 1], expected: 0 },
+            { gate: 'XNOR', inputs: [1, 0], expected: 0 },
+            { gate: 'XNOR', inputs: [1, 1], expected: 1 },
+        ];
+
+        let html = '';
+        let allPassed = true;
+
+        const gates = ['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'XNOR'];
+        
+        gates.forEach(gate => {
+            const gateTests = tests.filter(t => t.gate === gate);
+            
+            html += `<h2>${gate} Gate</h2>`;
+            html += '<table>';
+            
+            if (gate === 'NOT') {
+                html += '<tr><th>Input</th><th>Expected</th><th>Actual</th><th>Result</th></tr>';
+            } else {
+                html += '<tr><th>Input A</th><th>Input B</th><th>Expected</th><th>Actual</th><th>Result</th></tr>';
+            }
+            
+            gateTests.forEach(test => {
+                const result = testGate(test.gate, test.inputs, test.expected);
+                const status = result.pass ? 'PASS' : 'FAIL';
+                const className = result.pass ? 'pass' : 'fail';
+                
+                if (!result.pass) allPassed = false;
+                
+                if (gate === 'NOT') {
+                    html += `<tr>
+                        <td>${test.inputs[0]}</td>
+                        <td>${test.expected}</td>
+                        <td>${result.output}</td>
+                        <td class="${className}">${status}</td>
+                    </tr>`;
+                } else {
+                    html += `<tr>
+                        <td>${test.inputs[0]}</td>
+                        <td>${test.inputs[1]}</td>
+                        <td>${test.expected}</td>
+                        <td>${result.output}</td>
+                        <td class="${className}">${status}</td>
+                    </tr>`;
+                }
+            });
+            
+            html += '</table>';
+        });
+
+        html = `<h2 style="color: ${allPassed ? '#00ff44' : '#ff3333'}">
+            ${allPassed ? '✓ ALL TESTS PASSED' : '✗ SOME TESTS FAILED'}
+        </h2>` + html;
+
+        document.getElementById('results').innerHTML = html;
+    </script>
+</body>
+</html>
