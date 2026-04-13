@@ -1,2 +1,3 @@
 # Logic_gates_simulator
 ...........
+https://logic-gates-simulator-c687v2lmy-rishav0609s-projects.vercel.app/
